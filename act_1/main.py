@@ -9,10 +9,10 @@ def select_diff(level):
     global score, question_count, max_questions
     score = 0 # set baseline score
     question_count = 0 # set baseline question count
-    max_questions = 3 # CONFIGURABLE - defines how many questions there are per run
+    max_questions = 3 # CONFIGURABLE - defines how many questions there are per run, made it configurable for debug purposes
     start(level)
 
-def random_int(difficulty):
+def random_int(difficulty): # function establishes the different number values based on the passed on difficulty
     if difficulty == 'easy':
         return randint(1,9), randint(1,9)
     elif difficulty == 'moderate':
@@ -20,20 +20,20 @@ def random_int(difficulty):
     elif difficulty == 'advanced':
         return randint(1000,9999), randint(1000,9999)
 
-def decide_op():
+def decide_op(): # randomizes the operation
     if randint(0,1) == 0:
         return '+'
     else:
         return '-'
 
-def generate_question(difficulty):
-    x, y = random_int(difficulty)
-    op = decide_op()
-    question = f"{x} {op} {y}"
-    answer = eval(question)
+def generate_question(difficulty): # creates the question given the difficulty
+    x, y = random_int(difficulty) # establishes numbers
+    op = decide_op() # fetches randomize operation
+    question = f"{x} {op} {y}" # creates the question as a string  
+    answer = eval(question) # computes the answer by using the eval function
     return question, answer
 
-def result_display(user_score, max_count):
+def result_display(user_score, max_count): # screen that displays once all questions are done
     result_label = Label(root, text=f"You scored: {user_score} / {max_count}!", font=("Arial", 24))
     result_label.pack(pady=15)
 
@@ -44,15 +44,15 @@ def result_display(user_score, max_count):
 
 # main func, will begin when difficulty is selected.
 def start(difficulty):
-    for w in root.winfo_children():
+    for w in root.winfo_children(): # clears the current screen
         w.destroy()
     
     # setting up variables
-    global c_difficulty, c_question, c_answer, score, question_count, max_questions
+    global c_difficulty, c_question, c_answer, score, question_count, max_questions # establishes these variables as global variables since they are used in other functions
     c_difficulty = difficulty
-    c_question, c_answer = generate_question(c_difficulty)
+    c_question, c_answer = generate_question(c_difficulty) # generates the question and answer and saves it as their own respective variables
 
-    # stops and displays results when question count matches max question count
+    # stops and displays results when question count matches max question count, marking the end of the current run
     if question_count >= max_questions:
         result_display(score, max_questions)
         return # prevents the rest of the function to keep running after the results
@@ -71,7 +71,7 @@ def start(difficulty):
     submit_button = Button(root, text="Submit")
     submit_button.pack(pady=5)
 
-    # result box, shows if correct or wrong
+    # result box, shows if correct or wrong. is hidden/blank by default
     result_label = Label(root, text="", font=("Arial", 15))
     result_label.pack(pady=15)
     
@@ -79,13 +79,13 @@ def start(difficulty):
     def check_answer(answer):
         global score, question_count, max_questions, reattempt
         try:
-            response = int(response_box.get()) # calls the response inside the box
+            response = int(response_box.get()) # fetches the response inside the box as an integer
         except ValueError:
             result_label.config(text="Please enter a valid number.", fg="orange", font=("Arial", 25))
             return
 
         if answer == response:
-            print('Correct!') # for debug purposes
+            print('Correct!') # used for debug purposes
             result_label.config(text="Correct!", fg="green", font=("Arial", 25)) # this line of code / solution is creditted to ChatGPT, where i asked it for methods on how to make a dynamically updating display for answer results
             score += 1 # adds 1 to score
 
