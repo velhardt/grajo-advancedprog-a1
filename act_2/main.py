@@ -11,22 +11,22 @@ with open(file_path, "r") as file:
 
 # FUNCTIONS -----
 
-def random_joke():
-    joke = choice(jokes)
-    setup, punchline = joke.split('?')
-    return f'{setup}?', punchline
+def random_joke(): # function to generate the joke
+    joke = choice(jokes) # a function from the random library, which just fetches a random entry from a list
+    setup, punchline = joke.split('?') # splits the entry into 2 values, split based on the '?' since all jokes in the given txt file follow the same format
+    return f'{setup}?', punchline # returns 2 values
 
 def display_setup():
     for w in root.winfo_children(): # clears the window
         w.destroy()
-    setup, punchline = random_joke()
+    setup, punchline = random_joke() # establishes the two variables
     setup_label = Label(root, text=setup, width=55, font=("Arial", 15))
     setup_label.place(anchor=CENTER, relx=0.5, rely=0.3)
 
     response_button = Button(root, text="Why?", width=55, justify=CENTER, command=lambda: display_punchline(punchline))
     response_button.place(anchor=CENTER,relx=0.5,rely=0.5)
 
-    def display_punchline(punchline):
+    def display_punchline(punchline): # displays the punchline, as well as replaces the central button, prompting the user to ask for another joke if wanted
         punchline_label = Label(root, text=punchline, width=55, font=("Arial", 15))
         punchline_label.place(anchor=CENTER, relx=0.5, rely=0.7)
         response_button.config(text="Tell me another joke!", command=display_setup)  #changes the 'why' button back into the 'tell me a joke' button
