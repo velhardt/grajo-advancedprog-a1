@@ -105,7 +105,7 @@ def start(difficulty):
 
         print(f"{score} / {max_questions} - question {question_count}") # debug score
         
-        root.after(1200, lambda: start(c_difficulty))
+        root.after(1200, lambda: start(c_difficulty)) # makes use of the 'time' library to add a short delay when a question is finished, giving time to present the outcome
     
     submit_button.config(command=lambda: check_answer(c_answer)) # i had to configure the button to have the function AFTER the function, because inside the check_answer, i hide the button, so i had to define the button first, then the function, then insert the function into the button.
 
