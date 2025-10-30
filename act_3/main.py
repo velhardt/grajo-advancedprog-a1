@@ -17,10 +17,10 @@ for student in marks: #
     separated_data = student.strip().split(',')
     
     separated_data[0] = int(separated_data[0])
-    separated_data[2:] = [int(x) for x in separated_data[2:]]
+    separated_data[2:] = [int(x) for x in separated_data[2:]] # convers all indices from the 3rd value become integers, since the 3rd index onwards are grade values, which should be integers
     
-    coursework_total = separated_data[2] + separated_data[3] + separated_data[4]
-    ov_perc = (( coursework_total + separated_data[5] ) / 160) * 100
+    coursework_total = separated_data[2] + separated_data[3] + separated_data[4] # combines all the coursework grade values to create the coursework total 
+    ov_perc = (( coursework_total + separated_data[5] ) / 160) * 100 # calculates the overall percentage grade
     ov_perc = round(ov_perc, 2) # rounds percentage value to the 2nd decimal place
     student_grade = lambda x: 'A' if x  >= 70 else 'B' if x >= 60 else 'C' if x >= 50 else 'D' if x >= 40 else 'F' # lambda function to return the grade
 
@@ -29,7 +29,7 @@ for student in marks: #
         "Name" : separated_data[1],
         "Coursework Total" : coursework_total,
         "Exam Mark" : separated_data[5],
-        "Overall Percentage" : f"{ov_perc}%", # formats nicely
+        "Overall Percentage" : f"{ov_perc}%", # formats the overall percentage value to be nice and readable
         "Student Grade" : student_grade(ov_perc)
     }
 
@@ -47,7 +47,7 @@ pad.grid(row=0, column=0, sticky='nsew', rowspan=15, columnspan=65)
 root.grid_columnconfigure(0, weight=1)
 root.grid_rowconfigure(0, weight=1)
 
-for i in range(65):  # columns 0–20
+for i in range(65):  # establishes grid size and spacing
     pad.grid_columnconfigure(i, weight=1)
 pad.grid_rowconfigure(15, weight=1)
 pad.grid_rowconfigure(6, weight=1)
@@ -55,34 +55,33 @@ pad.grid_rowconfigure(6, weight=1)
 
 
 def main_ui():
-
     ## functions
-    def update_text(text):
+    def update_text(text): # updates the textbox to display the fetched data
         text_box.config(state=NORMAL)
         text_box.delete('1.0', END)
         text_box.insert('1.0', text)
         text_box.config(state=DISABLED)
 
-    def get_readable_info(data):
+    def get_readable_info(data): # converts the list into a readable, spaced out entry
         lines = [f"{k}: {v}" for k, v in data.items()]
         return ("\n".join(lines))
 
     # viewing funcs
-    def view_all_func():
+    def view_all_func(): # function to view all available students
         text = ""
         for id, info in student_dict.items():
             text += f"{get_readable_info(info)}\n\n"
         update_text(text)
 
-    def view_highest_student():
+    def view_highest_student(): # function to view the student with the highest overall percentage
         highest_id = max(student_dict, key=lambda id: float(student_dict[id]["Overall Percentage"].rstrip('%')))
         update_text(get_readable_info(student_dict[highest_id]))
             
-    def view_lowest_student():
+    def view_lowest_student(): # same as the above function, but lowest overall percentage
         lowest_id = min(student_dict, key=lambda id: float(student_dict[id]["Overall Percentage"].rstrip('%')))
         update_text(get_readable_info(student_dict[lowest_id]))
 
-    def select_specific_student():
+    def select_specific_student(): # selects a specific student as selected in the combobox button
         try:
             selected_id = int(student_listbox.get().split('-')[0].strip())
         except ValueError:
@@ -93,7 +92,7 @@ def main_ui():
             return
         update_text(get_readable_info(student_dict[selected_id]))
 
-    def view_sorted(): #0 ascend 1 descend
+    def view_sorted(): #shows all students, listed in ascending or descending order
         selected_sort = view_sort.current()
         if selected_sort == 1: # descending
             sorted_dict = dict(sorted(student_dict.items(), key=lambda i: float(i[1]['Overall Percentage'].rstrip('%'))))
@@ -105,16 +104,16 @@ def main_ui():
         update_text(text)
 
     def add_new_student():
-        def validate_add():
+        def validate_add(): # function run when the add button is pressed. will iterate through all the entries, if all entries are valid, then the student will be added
             #recolors all fields to white just in case
-            for e in [id_field, name_field, g1_field, g2_field, g3_field, exam_field]:
+            for e in [id_field, name_field, g1_field, g2_field, g3_field, exam_field]: # changes all boxes to white, refreshing it when the button is pressed to de-highlight any valid entries in case a non-valid entry became valid
                 e.config(bg="white")
-            def mark_check(m): # for the 4 different marks, since they all need the same requirements
+            def mark_check(m): # used for checking the 3 different cw marks, since they all need the same requirements
                 if not (0 <= m <= 20):
                     return True
                 return False
             
-            error_list = []
+            error_list = [] # establishes error list, to be displayed in an errorbox if an entry is invalid at the end
             valid = True
 
             ## student id checking 
@@ -128,7 +127,7 @@ def main_ui():
                         existing_ids.append(line[0]) # makes list of existing ids
                 if id in existing_ids: # checks if id already exists.
                     raise ValueError
-                if not (1000 <= id <= 9999): # checks if id is valid
+                if not (1000 <= id <= 9999): # checks if id is valid. the assessment dictates that valid ids are between 1000 to 9999.
                     raise ValueError
             except ValueError:
                 valid = False
@@ -204,7 +203,7 @@ def main_ui():
         add_window = Toplevel(root)
         add_window.title("Add new student")
 
-        for i in range(2):  # columns 0–2
+        for i in range(2):  # adjusts spacing, ensuring equal width for 3 columns
             add_window.grid_columnconfigure(i, weight=1)
 
         id_label = Label(add_window, text="Student ID:")
@@ -241,36 +240,36 @@ def main_ui():
         submit_button.grid(row=6, column=0, columnspan=2, padx=5, pady=5, sticky='we')
 
     def delete_student():
-        deleted_id = delete_listbox.get().split('-')[0].strip()
-        if not deleted_id:
+        deleted_id = delete_listbox.get().split('-')[0].strip() # fetches the selected id from the corresponding combobox
+        if not deleted_id: # checks if the combobox is null/empty
             messagebox.showerror("Error", "No student selected")
             return
-        existing_ids = []
+        existing_ids = [] # establishes list for the ids to be appended into
         with open(file_path, "r") as file:
             for line in file:
                 line = line.strip().split(',')
                 line[0] = int(line[0])
                 existing_ids.append(line[0])
-        if int(deleted_id) not in existing_ids:
+        if int(deleted_id) not in existing_ids: # catching error, just in case a student is deleted and the selection remains in the UI.
             messagebox.showerror("Error", "Student doesn't exist")
             return
         with open(file_path, 'r') as file:
             lines =  file.readlines()
         
-        lines = [line for line in lines if not line.startswith(f"{deleted_id},")] # rewrites/reintegrates all content in the file, EXCEPT for the selected id
+        lines = [line for line in lines if not line.startswith(f"{deleted_id},")] # rewrites/reintegrates all content in the file, EXCEPT for the selected id, effectively deleting it
 
         with open(file_path, 'w') as file:
             file.writelines(lines)
         messagebox.showinfo("Success", "Deleted student succesfully.")        
-        with open(file_path, 'r') as file: # will update the total number of students at the top of the txt.
+        with open(file_path, 'r') as file:
             lines = file.readlines()
 
-        lines[0] = str(int(lines[0].strip()) - 1) + '\n'
+        lines[0] = str(int(lines[0].strip()) - 1) + '\n'  # will update the total number of students at the top of the txt.
         with open(file_path, 'w') as file:
             file.writelines(lines)
 
     def update_student():
-        def validate_update(select_id): # reused from the add student function.
+        def validate_update(select_id): # reused from the add student function, since it uses the same logic but with slightly different variables used.
             for e in [id_field, name_field, g1_field, g2_field, g3_field, exam_field]:
                 e.config(bg="white")
             def mark_check(m): # for the 4 different marks, since they all need the same requirements
@@ -290,7 +289,7 @@ def main_ui():
                         line = line.strip().split(',')
                         line[0] = int(line[0])
                         existing_ids.append(line[0]) # makes list of existing ids
-                if id in existing_ids and id != int(select_id): # checks if id already exists.
+                if id in existing_ids and id != int(select_id): # checks if id already exists, and additionally checks if id is NOT the same as the already existing id. this is because i allow the student file to be updated while retaining the same id, while restricting the update in the case that the id already exists
                     raise ValueError
                 if not (1000 <= id <= 9999): # checks if id is valid
                     raise ValueError
@@ -354,8 +353,8 @@ def main_ui():
                 with open(file_path, 'r') as file:
                     lines = file.readlines()
 
-                selected_student_index = [lines.index(l) for l in lines if l.startswith(selected_id)]
-                lines[selected_student_index[0]] = updated_string
+                selected_student_index = [lines.index(l) for l in lines if l.startswith(selected_id)] # given a list of all the students, fetches the index of the selected student
+                lines[selected_student_index[0]] = updated_string # the entry of that specific index (the selected student) gets updated with the new information
                 with open(file_path, 'w') as file:
                     file.writelines(lines)
 
@@ -366,7 +365,7 @@ def main_ui():
         ###
 
         selected_id = update_listbox.get().split('-')[0].strip()
-        if not selected_id:
+        if not selected_id: # stops the code if the selected student is null/nothing is selected in the combobox
             messagebox.showerror("Error", "No student selected")
             return
         existing_ids = []
@@ -375,7 +374,7 @@ def main_ui():
                 line = line.strip().split(',')
                 line[0] = int(line[0])
                 existing_ids.append(line[0])
-        if int(selected_id) not in existing_ids:
+        if int(selected_id) not in existing_ids: # same logic as before, in the case that a student is updated and the id may have changed, will stop the code from functioning
             messagebox.showerror("Error", "Student doesn't exist")
             return
         update_window = Toplevel(root)
@@ -417,7 +416,7 @@ def main_ui():
         submit_button = Button(update_window, text="Update student", command=lambda: validate_update(selected_id))
         submit_button.grid(row=6, column=0, columnspan=2, padx=5, pady=5, sticky='we')
 
-        # fetches data of selected student and readies them as variables
+        # fetches data of selected student and establishes them as variables
         with open(file_path, 'r') as file:
             lines =  file.readlines()
         lines = [line for line in lines if line.startswith(f"{selected_id}")]
@@ -430,6 +429,7 @@ def main_ui():
         s_cw3 = lines[4]
         s_exam = lines[5]
 
+        # the data of the selected student is then inserted into the entries, allowing ease of access when updating a student's data
         id_field.insert(0, s_id)
         name_field.insert(0, s_name)
         g1_field.insert(0, s_cw1)
@@ -489,7 +489,7 @@ def main_ui():
     delete_button.grid(row=8, column=1, sticky='we', padx=5, pady=5)
 
 
-    # contents for dropdown
+    # establishes contents for dropdown
     student_list = []
     for k, v in student_dict.items():
         student_list.append(f"{k} - {v["Name"]}")
